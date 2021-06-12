@@ -7,36 +7,7 @@ defmodule DecentApp do
         if error do
           {nil, nil, true}
         else
-          is_error =
-            cond do
-
-              length(res) < 1 ->
-                if command == "DUP" || command == "POP" || command == "+" || command == "-" do
-                  true
-                else
-                  false
-                end
-              length(res) < 2 ->
-                if command == "+" || command == "-" do
-                  true
-                else
-                  false
-                end
-
-              is_integer(command) ->
-                if command < 0 || command > 10 do
-                  true
-                else
-                  false
-                end
-
-              command != "NOTHING" && command != "DUP" && command != "POP" && command != "+" &&
-                command != "-" && command != "COINS" && !is_integer(command) ->
-                true
-
-              true ->
-                false
-            end
+          is_error = check_error(command, res)
           if is_error do
             {nil, nil, true}
           else
@@ -105,4 +76,11 @@ defmodule DecentApp do
       end
     end
   end
+
+  def check_error(command, list) when command in ["DUP", "POP"], do: length(list) < 1
+  def check_error(command, list) when command in ["+", "-"], do: length(list) < 2
+  def check_error(command, _list) when command in ["COINS", "NOTHING"], do: false
+  def check_error(command, _list) when is_integer(command), do: command < 0 || command > 10
+  def check_error(_command, _list), do: true
+
 end
