@@ -12,41 +12,7 @@ defmodule DecentApp do
             {nil, nil, true}
           else
             new_balance = new_balance(command, bal)
-
-            res =
-              cond do
-                command === "NOTHING" ->
-                  res
-
-                true ->
-                  cond do
-                    command == "DUP" ->
-                      res ++ [List.last(res)]
-
-                    true ->
-                      if command == "POP" do
-                        {_, res} = List.pop_at(res, length(res) - 1)
-                        res
-                      else
-                        cond do
-                          command == "+" ->
-                            [first, second | rest] = Enum.reverse(res)
-                            Enum.reverse(rest) ++ [first + second]
-
-                          command == "-" ->
-                            [first, second | rest] = Enum.reverse(res)
-                            Enum.reverse(rest) ++ [first - second]
-
-                          is_integer(command) ->
-                            res ++ [command]
-
-                          command == "COINS" ->
-                            res
-                        end
-                      end
-                  end
-              end
-
+            res = execute(command, res)
             {new_balance, res, false}
           end
         end
@@ -72,4 +38,24 @@ defmodule DecentApp do
   def new_balance(command, %Balance{} = bal) when command == "COINS" , do: %{bal | coins: bal.coins + 5}
   def new_balance(command, %Balance{} = bal) when command == "+" , do: %{bal | coins: bal.coins - 2}
   def new_balance(_command, %Balance{} = bal), do: %{bal | coins: bal.coins - 1}
+
+  def execute("DUP", res), do: res ++ [List.last(res)]
+  def execute("COINS", res), do: res
+  def execute("NOTHING", res), do: res
+  def execute("POP", res) do
+    {_, res} = List.pop_at(res, length(res) - 1)
+    res
+  end
+  def execute("+", res) do
+    [first, second | rest] = Enum.reverse(res)
+    res = Enum.reverse(rest) ++ [first + second]
+    res
+  end
+  def execute("-", res) do
+    [first, second | rest] = Enum.reverse(res)
+    res = Enum.reverse(rest) ++ [first - second]
+    res
+  end
+  def execute(command, res) when is_integer(command), do: res ++ [command]
+
 end
