@@ -11,7 +11,7 @@ defmodule DecentApp do
           if is_error do
             {nil, nil, true}
           else
-            new_balance = %{bal | coins: bal.coins - 1}
+            new_balance = new_balance(command, bal)
 
             res =
               cond do
@@ -47,20 +47,6 @@ defmodule DecentApp do
                   end
               end
 
-            new_balance =
-              if command == "COINS" do
-                %{new_balance | coins: new_balance.coins + 6}
-              else
-                new_balance
-              end
-
-            new_balance =
-              if command == "+" do
-                %{new_balance | coins: new_balance.coins - 1}
-              else
-                new_balance
-              end
-
             {new_balance, res, false}
           end
         end
@@ -83,4 +69,7 @@ defmodule DecentApp do
   def check_error(command, _list) when is_integer(command), do: command < 0 || command > 10
   def check_error(_command, _list), do: true
 
+  def new_balance(command, %Balance{} = bal) when command == "COINS" , do: %{bal | coins: bal.coins + 5}
+  def new_balance(command, %Balance{} = bal) when command == "+" , do: %{bal | coins: bal.coins - 2}
+  def new_balance(_command, %Balance{} = bal), do: %{bal | coins: bal.coins - 1}
 end
