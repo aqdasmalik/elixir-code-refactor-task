@@ -2,32 +2,27 @@ defmodule DecentApp do
   alias DecentApp.Balance
 
   def call(%Balance{} = balance, commands) do
-    {balance, result, error} =
-      Enum.reduce(commands, {balance, [], false}, fn command, {bal, res, error} ->
-        if error do
-          {nil, nil, true}
-        else
-          is_error = check_error(command, res)
-          if is_error do
-            {nil, nil, true}
-          else
-            new_balance = new_balance(command, bal)
-            res = execute(command, res)
-            {new_balance, res, false}
-          end
-        end
-      end)
+    {balance, result, error} = call_recurr(commands, balance, [], false)
 
-    if error do
-      -1
-    else
-      if balance.coins < 0 do
-        -1
-      else
+    cond do
+      error || balance.coins < 0 ->
+         -1
+      true ->
         {balance, result}
-      end
     end
   end
+
+  def call_recurr([], balance, res, false), do: {balance, res, false}
+  def call_recurr([command | commands], balance, res, false) do
+    if check_error(command, res) do
+      {nil, nil, true}
+    else
+      balance = new_balance(command, balance)
+      res = execute(command, res)
+      call_recurr(commands, balance, res, false)
+    end
+  end
+  def call_recurr(_, _, _, true), do: {nil, nil, true}
 
   def check_error(command, list) when command in ["DUP", "POP"], do: length(list) < 1
   def check_error(command, list) when command in ["+", "-"], do: length(list) < 2
