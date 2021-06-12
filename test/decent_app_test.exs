@@ -9,10 +9,11 @@ defmodule DecentAppTest do
       balance = %Balance{coins: 10}
 
       {new_balance, result} =
-        DecentApp.call(balance, [3, "DUP", "COINS", 5, "+", "NOTHING", "POP", 7, "-", 9])
+        DecentApp.call(balance, [3, "DUP", "COINS", 5, "+", "NOTHING", "POP", 7, "-", 9, 1, 2, "*"])
 
-      assert new_balance.coins == 5
+      assert new_balance.coins == 0
       assert length(result) > 1
+      assert List.last(result) == 18
     end
 
     test "failed" do
