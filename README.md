@@ -67,3 +67,22 @@ git commit -m "Initial commit"
 ```
 
 You can either push new repo to github or bundle it and send `.bundle` file
+
+## Configration to add new Commands
+Goto decent_app/config.ex add your new configrations to the map following the pattern below.
+
+  ```
+  "Command Name" => %{
+    cost: 1, # Can be a negative value if you need to add coins
+    required_length: 2, # Restriction of list length for this command to execute properly
+    execution:
+      quote do
+        # Capture the list in your code
+        res = var!(res)
+
+        # Code of your execution
+        # Write Any valid elixir code and return result
+        res
+      end
+  }
+  ```
